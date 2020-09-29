@@ -1,4 +1,4 @@
-import smtplib
+import smtplib, ssl
 from pathlib import Path
 import datetime as dt
 from email import encoders
@@ -25,7 +25,7 @@ def generateChart(TEST_CASES):
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90, colors=['Green', 'Red'])
     ax1.axis('equal')  #Equal aspect ratio ensures that pie is drawn as a circle.
-    plt.savefig(pieChart, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None, transparent=False, bbox_inches=None, pad_inches=0.1, frameon=None, metadata=None)
+    plt.savefig(pieChart, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None, transparent=False, bbox_inches=None, pad_inches=0.1, metadata=None)
 
     return pieChart
 
@@ -45,9 +45,9 @@ def send(logFile, sender, TEST_CASES):
 
     filename = Path(logFile).name
     print("Sending " + str(filename))
-    smtp_server = "mail.tauttechsystems.com"
-    sender_email = 'drtautology@mailserver.tauttechsystems.com'
-    server = smtplib.SMTP(smtp_server)
+    #smtp_server = "mail.tauttechsystems.com"
+    sender_email = sender
+    #server = smtplib.SMTP(smtp_server)
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Tests: " + str([i for i in TEST_CASES])
@@ -58,12 +58,12 @@ def send(logFile, sender, TEST_CASES):
     html1 = """\
 <h1 style="color: #5e9ca0;">Test Results</h1>
 <p><em>Generated on:{date}</em></p>
-<table> style="height: 127px; background-color: lightgrey; border-color: black; width: 1000px;" width="1000" border="B">
-<tbody
+<table style="height: 127px; background-color: lightgrey; border-color: black; width: 1000px;" width="1000" border="B">
+<tbody>
 <tr>
-<td style="width: 250px;><strong>Test Name</strong></td>
-<td style="width: 165px;><strong>Results</strong></td>
-<td style="width: 2000px;><strong>Details</strong></td>
+<td style="width: 250px;"><strong>Test Name</strong></td>
+<td style="width: 165px;"><strong>Results</strong></td>
+<td style="width: 2000px;"><strong>Details</strong></td>
 </tr>
 """.format(date=date)
 
@@ -77,7 +77,7 @@ def send(logFile, sender, TEST_CASES):
     html3 = """\
 </tbody>
 </table>
-<p>&nbsp;**** This is a system generated email. Do not reply. ****</p>
+<p>&nbsp;**** This is a system generated email. Do not reply.****</p>
 """
 
     #generate HTM based on test cases and results
@@ -118,4 +118,9 @@ def send(logFile, sender, TEST_CASES):
     part.add_header("Content-Disposition", f"attachment; filename = {filename}",)
     message.attach(part)
 
-    server.sendmail(sender_email, recipients, message.as_string())
+    context = ssl.create_default_context()
+    port = 465
+    password = "Notifications Only!"
+    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, recipients, message.as_string())
