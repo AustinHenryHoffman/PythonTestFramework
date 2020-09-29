@@ -1,7 +1,7 @@
 import unittest
 import logging
 import socket
-imiport datetime as dt
+import datetime as dt
 import configparser
 from pathlib import Path
 
@@ -17,9 +17,9 @@ class test_case(unittest.TestCase):
 
         #setting up logger
         #Log file string for passing to logging config
-        self.LOG_FILE = str(Path(self.LOG_DIR, dt.datetime.now().strftime("%m-%d-%y %I_%M_%S") + "_" +str(__class__.name__) + ".log").absolute())
+        self.LOG_FILE = str(Path(self.LOG_DIR, dt.datetime.now().strftime("%m-%d-%y %I_%M_%S") + "_" +str(__class__.__name__) + ".log").absolute())
         LOG_FORMAT = "%(levelname)s %(asctime)s - %(message)s"
-        logging.basicConfig(filename=self.LOG_FILE level=logging.INFO, format=LOG_FORMAT, filemode='a')
+        logging.basicConfig(filename=self.LOG_FILE, level=logging.INFO, format=LOG_FORMAT, filemode='a')
         self.logger = logging.getLogger("unittestLogger")
         self.logger.info("Running " + str(__class__.__name__))
         
@@ -31,6 +31,7 @@ class test_case(unittest.TestCase):
         #API Vars
         self.api_user = config.get('TEST_API', 'PASSWD')
         #Put env check here
+        self.HOSTNAME = socket.gethostname()
         if self.HOSTNAME == "computer name here":
             self.sender_email = config.get('EMAIL', 'sender_email')
         else:
@@ -39,7 +40,7 @@ class test_case(unittest.TestCase):
         #dictionary with test case id/result key value pair
         self.test_cases = {}
     @classmethod
-    def tearDownClass
+    def tearDownClass(self):
         #shutting down logging
         logging.shutdown()
         print("Sending " + self.LOG_FILE)
