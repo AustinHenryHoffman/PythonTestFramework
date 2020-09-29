@@ -39,7 +39,7 @@ def send(logFile, sender, TEST_CASES):
     #getting recipient from config file
     #config_dir = Path('./config.ini')
     config = configparser.ConfigParser()
-    #full path to config /opt/ccdm/Data Mart Jobs/toolkit/ETL_Test_Framework/Master/
+    #full path to config /opt/Test_Framework/Master/
     config.read('config.ini')
     recipients = config.get('EMAIL', 'recipients').split(',')
 
