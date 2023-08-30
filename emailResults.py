@@ -120,7 +120,7 @@ def send(logFile, sender, TEST_CASES):
 
     context = ssl.create_default_context()
     port = 465
-    password = "Notifications Only!"
+    password = "Test"
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(sender_email, password)
         server.sendmail(sender_email, recipients, message.as_string())
